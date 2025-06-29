@@ -1,0 +1,8 @@
+package com.flab.domain.model.user
+
+data class User(
+    val gender: String,
+    val email: String,
+    val phone: String,
+    val cell: String
+)
