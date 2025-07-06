@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "lolTube"
 include(":app")
+include(":data")
