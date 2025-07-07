@@ -7,16 +7,19 @@ import androidx.lifecycle.viewModelScope
 import com.flab.data.repository.UserRepository
 import com.flab.loltube.model.user.UserUiState
 import com.flab.loltube.model.user.mapper
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class UserViewModel(
+@HiltViewModel
+class UserViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _users = MutableLiveData<List<UserUiState>>()
     val users: LiveData<List<UserUiState>> = _users
 
-    suspend fun fetchUsers(count: Int) {
+    fun fetchUsers(count: Int) {
         viewModelScope.launch {
             val users = userRepository.getUsers(count)
             _users.value = users.map { it.mapper() }
