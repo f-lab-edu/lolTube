@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.flab.loltube.R
 import com.flab.loltube.model.user.UserUiState
 
@@ -27,7 +28,7 @@ fun UserListScreen(
     modifier: Modifier = Modifier
 ) {
 
-    val users by viewModel.users.observeAsState(initial = emptyList())
+    val users by viewModel.users.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier.fillMaxSize(),
