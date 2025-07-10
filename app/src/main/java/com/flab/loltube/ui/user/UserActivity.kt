@@ -9,9 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class UserActivity : ComponentActivity() {
@@ -32,8 +30,6 @@ class UserActivity : ComponentActivity() {
 
         }
 
-        lifecycleScope.launch {
-            viewModel.fetchUsers(10)
-        }
+        viewModel.fetchUsers(10)
     }
 }

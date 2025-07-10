@@ -8,20 +8,17 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object ServiceModule {
 
     @Provides
-    @Singleton
     fun provideRandomUserService(): RandomUserService {
         return RetrofitClient.createService()
     }
 
     @Provides
-    @Singleton
     fun provideUserRepository(randomUserService: RandomUserService): UserRepository {
         return UserRepositoryImpl(randomUserService)
     }
