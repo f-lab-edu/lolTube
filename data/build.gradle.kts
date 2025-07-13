@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -5,15 +7,26 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+val properties = Properties()
+properties.load(project.rootProject.file("local.properties").inputStream())
+
 android {
     namespace = "com.flab.data"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 21
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+        buildFeatures {
+            buildConfig = true
+        }
+        buildConfigField(
+            "String",
+            "YOUTUBE_API_KEY",
+            "\"${properties.getProperty("YOUTUBE_API_KEY")}\""
+        )
     }
 
     buildTypes {
