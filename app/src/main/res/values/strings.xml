@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">lolTube</string>
+    <string name="user_gender">성별: %1$s</string>
+    <string name="user_email">이메일: %1$s</string>
+    <string name="user_phone">전화: %1$s</string>
+    <string name="user_cell">휴대폰: %1$s</string>
+</resources>
