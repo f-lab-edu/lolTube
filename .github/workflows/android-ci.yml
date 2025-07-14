@@ -31,7 +31,9 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run unit tests
-        run: ./gradlew :app:testDebugUnitTest --stacktrace 
+        run: ./gradlew :app:testDebugUnitTest --stacktrace
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
 
       - name: Publish Test Results
         if: always()
