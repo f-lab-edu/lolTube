@@ -18,6 +18,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,25 +26,53 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.flab.data.response.youtube.VideoItem
 
+@Composable
+fun LolTubeVideoListRoute(
+    modifier: Modifier = Modifier,
+    viewModel: LolTubeViewModel = hiltViewModel()
+) {
+    val videos by viewModel.videos.collectAsStateWithLifecycle()
+
+    LolTubeVideoListScreen(
+        videos = videos,
+        modifier = modifier
+    )
+}
 
 @Composable
-fun LolTubeVideoListScreen(videos: List<VideoItem>, modifier: Modifier = Modifier) {
+fun LolTubeVideoListScreen(
+    videos: List<VideoItem>,
+    modifier: Modifier = Modifier
+) {
+    VideoListContent(
+        videos = videos,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun VideoListContent(
+    videos: List<VideoItem>,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(videos) { video ->
-            LolTubeVideoListItem(video = video)
+            VideoListItem(video = video)
         }
     }
 }
 
 @Composable
-fun LolTubeVideoListItem(video: VideoItem) {
+private fun VideoListItem(video: VideoItem) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -52,31 +81,56 @@ fun LolTubeVideoListItem(video: VideoItem) {
             modifier = Modifier.padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
-                model = video.snippet.thumbnails.high?.url,
-                contentDescription = video.snippet.title,
-                modifier = Modifier
-                    .size(120.dp, 90.dp)
-                    .clip(RoundedCornerShape(4.dp)),
-                contentScale = ContentScale.Crop
+            VideoThumbnail(
+                thumbnailUrl = video.snippet.thumbnails.high?.url,
+                title = video.snippet.title
             )
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = video.snippet.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = video.snippet.channelTitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
-                )
-            }
+            VideoInfo(
+                title = video.snippet.title,
+                channelTitle = video.snippet.channelTitle,
+                modifier = Modifier.weight(1f)
+            )
         }
+    }
+}
+
+@Composable
+private fun VideoThumbnail(
+    thumbnailUrl: String?,
+    title: String,
+    modifier: Modifier = Modifier
+) {
+    AsyncImage(
+        model = thumbnailUrl,
+        contentDescription = title,
+        modifier = modifier
+            .size(120.dp, 90.dp)
+            .clip(RoundedCornerShape(4.dp)),
+        contentScale = ContentScale.Crop
+    )
+}
+
+@Composable
+private fun VideoInfo(
+    title: String,
+    channelTitle: String,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = channelTitle,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray
+        )
     }
 }
