@@ -18,11 +18,7 @@ class LolTubeViewModel @Inject constructor(
     private val _videos = MutableStateFlow<List<VideoItem>>(emptyList())
     val videos = _videos.asStateFlow()
 
-    init {
-        fetchVideosForTest()
-    }
-
-    private fun fetchVideosForTest() {
+    fun fetchVideos() {
         viewModelScope.launch {
             try {
                 val result = lolTubeRepository.searchVideos(
