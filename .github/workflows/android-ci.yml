@@ -30,8 +30,18 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Touch local.properties
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          SDK_PATH: ${{ secrets.SDK_PATH }}
+        run: |
+          echo "YOUTUBE_API_KEY=$YOUTUBE_API_KEY" > ./local.properties
+          echo "sdk.dir=$SDK_PATH" >> ./local.properties
+
       - name: Run unit tests
-        run: ./gradlew :app:testDebugUnitTest --stacktrace 
+        run: ./gradlew :app:testDebugUnitTest --stacktrace
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
 
       - name: Publish Test Results
         if: always()

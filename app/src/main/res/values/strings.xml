@@ -4,4 +4,5 @@
     <string name="user_email">이메일: %1$s</string>
     <string name="user_phone">전화: %1$s</string>
     <string name="user_cell">휴대폰: %1$s</string>
+    <string name="title_activity_lol_tube_main">LolTubeMainActivity</string>
 </resources>
