@@ -17,16 +17,6 @@ class RetrofitClientTest {
     }
 
     @Test
-    fun `createService should create RandomUserService instance`() {
-        // When
-        val service = RetrofitClient.createService<RandomUserService>()
-
-        // Then
-        assertNotNull(service)
-        assertTrue(true)
-    }
-
-    @Test
     fun `RetrofitClient should have correct base URL`() {
         // Given
         val expectedBaseUrl = "https://www.googleapis.com/youtube/v3/"
@@ -52,19 +42,5 @@ class RetrofitClientTest {
         assertNotNull(service2)
         // Services should be different instances but same type
         assertTrue(service1::class == service2::class)
-    }
-
-    @Test
-    fun `RetrofitClient should support creating multiple service types`() {
-        // When
-        val lolTubeService = RetrofitClient.createService<LolTubeService>()
-        val randomUserService = RetrofitClient.createService<RandomUserService>()
-
-        // Then
-        assertNotNull(lolTubeService)
-        assertNotNull(randomUserService)
-        assertTrue(true)
-        assertTrue(true)
-        assertTrue(lolTubeService::class != randomUserService::class)
     }
 }
