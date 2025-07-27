@@ -76,6 +76,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 
 dependencies {
 
+    implementation(project(":core:domain"))
     implementation(project(":core:network"))
 
     implementation(libs.androidx.core.ktx)

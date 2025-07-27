@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import com.flab.network.response.youtube.VideoItem
+import com.flab.domain.model.Video
 
 @Composable
 fun LolTubeVideoListRoute(
@@ -51,7 +51,7 @@ fun LolTubeVideoListRoute(
 
 @Composable
 fun LolTubeVideoListScreen(
-    videos: List<VideoItem>,
+    videos: List<Video>,
     modifier: Modifier = Modifier
 ) {
     VideoListContent(
@@ -62,7 +62,7 @@ fun LolTubeVideoListScreen(
 
 @Composable
 private fun VideoListContent(
-    videos: List<VideoItem>,
+    videos: List<Video>,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -77,7 +77,7 @@ private fun VideoListContent(
 }
 
 @Composable
-private fun VideoListItem(video: VideoItem) {
+private fun VideoListItem(video: Video) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -87,15 +87,15 @@ private fun VideoListItem(video: VideoItem) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             VideoThumbnail(
-                thumbnailUrl = video.snippet.thumbnails.high?.url,
-                title = video.snippet.title
+                thumbnailUrl = video.thumbnailUrl,
+                title = video.title
             )
 
             Spacer(modifier = Modifier.width(8.dp))
 
             VideoInfo(
-                title = video.snippet.title,
-                channelTitle = video.snippet.channelTitle,
+                title = video.title,
+                channelTitle = video.channelTitle,
                 modifier = Modifier.weight(1f)
             )
         }
