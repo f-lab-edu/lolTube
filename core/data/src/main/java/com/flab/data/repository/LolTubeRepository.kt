@@ -1,7 +1,8 @@
 package com.flab.data.repository
 
-import com.flab.data.response.youtube.VideoItem
-import com.flab.data.service.LolTubeService
+import com.flab.network.response.youtube.VideoItem
+import com.flab.network.service.LolTubeService
+import com.flab.data.BuildConfig
 import javax.inject.Inject
 
 interface LolTubeRepository {
@@ -18,6 +19,7 @@ class LolTubeRepositoryImpl @Inject constructor(
         regionCode: String
     ): List<VideoItem> {
         val response = lolTubeService.searchVideos(
+            apiKey = BuildConfig.YOUTUBE_API_KEY,
             query = query,
             maxResults = maxResults,
             regionCode = regionCode

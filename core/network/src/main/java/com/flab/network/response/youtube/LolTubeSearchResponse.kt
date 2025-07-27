@@ -1,4 +1,4 @@
-package com.flab.data.response.youtube
+package com.flab.network.response.youtube
 
 import com.google.gson.annotations.SerializedName
 

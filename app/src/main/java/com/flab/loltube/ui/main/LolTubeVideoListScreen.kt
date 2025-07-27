@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import com.flab.data.response.youtube.VideoItem
+import com.flab.network.response.youtube.VideoItem
 
 @Composable
 fun LolTubeVideoListRoute(

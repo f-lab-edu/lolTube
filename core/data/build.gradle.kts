@@ -76,6 +76,8 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 
 dependencies {
 
+    implementation(project(":core:network"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -83,10 +85,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.kotlinx.coroutines.core)
-
-    // retrofit
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
 
     // hilt
     implementation(libs.hilt.android)

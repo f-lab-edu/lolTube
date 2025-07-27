@@ -3,7 +3,7 @@ package com.flab.loltube.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.flab.data.repository.LolTubeRepository
-import com.flab.data.response.youtube.VideoItem
+import com.flab.network.response.youtube.VideoItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
