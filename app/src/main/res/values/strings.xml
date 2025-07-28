@@ -5,4 +5,5 @@
     <string name="user_phone">전화: %1$s</string>
     <string name="user_cell">휴대폰: %1$s</string>
     <string name="title_activity_lol_tube_main">LolTubeMainActivity</string>
+    <string name="empty_video_list">동영상이 없습니다</string>
 </resources>
