@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import com.flab.loltube.ui.theme.LolTubeTheme
 
 @Composable
 fun VideoTitle(
@@ -23,4 +25,12 @@ fun VideoTitle(
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun VideoTitlePreview() {
+    LolTubeTheme {
+        VideoTitle(title = "[LOL] 프레이 유나라 : 유나라는 이 맛이지~")
+    }
 }

@@ -13,8 +13,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.flab.domain.model.Video
+import com.flab.loltube.ui.theme.LolTubeTheme
 
 @Composable
 fun VideoCard(
@@ -66,5 +68,23 @@ private fun VideoDetails(
     ) {
         VideoTitle(title = video.title)
         VideoChannelInfo(channelTitle = video.channelTitle)
+    }
+}
+
+private val sampleVideo = Video(
+    videoId = "1",
+    title = "[LOL] 프레이 유나라 : 유나라는 이 맛이지~",
+    channelTitle = "프레이 TV",
+    thumbnailUrl = "https://i.ytimg.com/vi/TpFNF9chDHc/hqdefault.jpg"
+)
+
+@Preview(showBackground = true)
+@Composable
+private fun VideoCardPreview() {
+    LolTubeTheme {
+        VideoCard(
+            video = sampleVideo,
+            onClick = { }
+        )
     }
 }

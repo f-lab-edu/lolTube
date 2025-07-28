@@ -7,6 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import com.flab.loltube.ui.theme.LolTubeTheme
 
 @Composable
 fun VideoChannelInfo(
@@ -34,4 +36,12 @@ fun ChannelName(
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun VideoChannelInfoPreview() {
+    LolTubeTheme {
+        VideoChannelInfo(channelTitle = "프레이 TV")
+    }
 }
