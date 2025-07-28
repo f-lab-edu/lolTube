@@ -1,5 +1,8 @@
 package com.flab.loltube.ui.main
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -20,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.flab.domain.model.Video
 import com.flab.loltube.R
 import com.flab.loltube.ui.main.component.VideoCard
+import androidx.core.net.toUri
 
 @Composable
 fun LolTubeVideoListRoute(
@@ -27,6 +32,7 @@ fun LolTubeVideoListRoute(
     viewModel: LolTubeViewModel = hiltViewModel()
 ) {
     val videos by viewModel.videos.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.fetchVideos()
@@ -36,9 +42,21 @@ fun LolTubeVideoListRoute(
         videos = videos,
         modifier = modifier,
         onVideoClick = { video ->
-            // TODO: 비디오 클릭 처리
+            openYouTubeVideo(context, video.videoId)
         }
     )
+}
+
+private fun openYouTubeVideo(context: Context, videoId: String) {
+    try {
+        val youtubeIntent = Intent(Intent.ACTION_VIEW, "vnd.youtube:$videoId".toUri())
+        youtubeIntent.setPackage("com.google.android.youtube")
+        context.startActivity(youtubeIntent)
+    } catch (e: Exception) {
+        val webIntent =
+            Intent(Intent.ACTION_VIEW, "https://www.youtube.com/watch?v=$videoId".toUri())
+        context.startActivity(webIntent)
+    }
 }
 
 @Composable
@@ -95,7 +113,7 @@ private fun VideoList(
         ) { video ->
             VideoCard(
                 video = video,
-                onClick = onVideoClick
+                onClick = { onVideoClick(video) }
             )
         }
     }
