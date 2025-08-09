@@ -1,36 +1,20 @@
 package com.flab.loltube.ui.main
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import android.content.Context
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
-import com.flab.data.response.youtube.VideoItem
+import com.flab.domain.model.Video
+import com.flab.loltube.ui.main.component.VideoList
+import com.flab.loltube.ui.main.component.EmptyVideoList
+import com.flab.loltube.ui.theme.LolTubeTheme
 
 @Composable
 fun LolTubeVideoListRoute(
@@ -38,6 +22,7 @@ fun LolTubeVideoListRoute(
     viewModel: LolTubeViewModel = hiltViewModel()
 ) {
     val videos by viewModel.videos.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.fetchVideos()
@@ -45,97 +30,76 @@ fun LolTubeVideoListRoute(
 
     LolTubeVideoListScreen(
         videos = videos,
-        modifier = modifier
+        modifier = modifier,
+        onVideoClick = { video ->
+            openYouTubeVideo(context, video.videoId)
+        }
     )
+}
+
+private fun openYouTubeVideo(context: Context, videoId: String) {
+    try {
+        val youtubeIntent = Intent(Intent.ACTION_VIEW, "vnd.youtube:$videoId".toUri())
+        youtubeIntent.setPackage("com.google.android.youtube")
+        context.startActivity(youtubeIntent)
+    } catch (e: Exception) {
+        val webIntent =
+            Intent(Intent.ACTION_VIEW, "https://www.youtube.com/watch?v=$videoId".toUri())
+        context.startActivity(webIntent)
+    }
 }
 
 @Composable
 fun LolTubeVideoListScreen(
-    videos: List<VideoItem>,
-    modifier: Modifier = Modifier
+    videos: List<Video>,
+    modifier: Modifier = Modifier,
+    onVideoClick: (Video) -> Unit = {}
 ) {
-    VideoListContent(
-        videos = videos,
-        modifier = modifier
-    )
-}
-
-@Composable
-private fun VideoListContent(
-    videos: List<VideoItem>,
-    modifier: Modifier = Modifier
-) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(videos) { video ->
-            VideoListItem(video = video)
-        }
-    }
-}
-
-@Composable
-private fun VideoListItem(video: VideoItem) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            VideoThumbnail(
-                thumbnailUrl = video.snippet.thumbnails.high?.url,
-                title = video.snippet.title
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            VideoInfo(
-                title = video.snippet.title,
-                channelTitle = video.snippet.channelTitle,
-                modifier = Modifier.weight(1f)
-            )
-        }
-    }
-}
-
-@Composable
-private fun VideoThumbnail(
-    thumbnailUrl: String?,
-    title: String,
-    modifier: Modifier = Modifier
-) {
-    AsyncImage(
-        model = thumbnailUrl,
-        contentDescription = title,
-        modifier = modifier
-            .size(120.dp, 90.dp)
-            .clip(RoundedCornerShape(4.dp)),
-        contentScale = ContentScale.Crop
-    )
-}
-
-@Composable
-private fun VideoInfo(
-    title: String,
-    channelTitle: String,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
+    if (videos.isEmpty()) {
+        EmptyVideoList(modifier = modifier)
+    } else {
+        VideoList(
+            videos = videos,
+            modifier = modifier,
+            onVideoClick = onVideoClick
         )
-        Text(
-            text = channelTitle,
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray
+    }
+}
+
+
+private val sampleVideos = listOf(
+    Video(
+        videoId = "1",
+        title = "[LOL] 프레이 유나라 : 유나라는 이 맛이지~",
+        channelTitle = "프레이 TV",
+        thumbnailUrl = "https://i.ytimg.com/vi/TpFNF9chDHc/hqdefault.jpg"
+    ),
+    Video(
+        videoId = "2",
+        title = "[LOL] 실버 탈출기",
+        channelTitle = "게임 TV",
+        thumbnailUrl = "https://i.ytimg.com/vi/example2/hqdefault.jpg"
+    )
+)
+
+@Preview(showBackground = true)
+@Composable
+private fun LolTubeVideoListScreenPreview() {
+    LolTubeTheme {
+        LolTubeVideoListScreen(
+            videos = sampleVideos,
+            onVideoClick = { }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LolTubeVideoListScreenEmptyPreview() {
+    LolTubeTheme {
+        LolTubeVideoListScreen(
+            videos = emptyList(),
+            onVideoClick = { }
         )
     }
 }
