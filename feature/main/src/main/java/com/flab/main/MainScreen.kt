@@ -1,8 +1,8 @@
 package com.flab.main
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -16,6 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.flab.home.LolTubeVideoListRoute
 import com.flab.main.component.MainNavigationBar
 import com.flab.main.component.NavigationItem
 
@@ -27,30 +31,42 @@ fun MainScreen() {
     )
 
     var selectedIndex by remember { mutableIntStateOf(0) }
+    val navController = rememberNavController()
 
     Scaffold(
         bottomBar = {
             MainNavigationBar(
                 selectedIndex = selectedIndex,
-                onItemSelected = { selectedIndex = it },
+                onItemSelected = { index ->
+                    selectedIndex = index
+                    when (index) {
+                        0 -> navController.navigate("home")
+                        1 -> navController.navigate("shorts")
+                    }
+                },
                 navigationItems = navigationItems
             )
         }
     ) { paddingValues ->
-        Box(
+        NavHost(
+            navController = navController,
+            startDestination = "home",
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentAlignment = Alignment.Center
+                .padding(paddingValues)
         ) {
-            Text(
-                text = when (selectedIndex) {
-                    0 -> "홈 화면"
-                    1 -> "쇼츠 화면"
-                    else -> "알 수 없는 화면"
-                },
-                fontSize = 24.sp
-            )
+            composable("home") {
+                LolTubeVideoListRoute()
+            }
+            composable("shorts") {
+                Text(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .wrapContentSize(Alignment.Center),
+                    text = "쇼츠 화면",
+                    fontSize = 24.sp
+                )
+            }
         }
     }
 }
