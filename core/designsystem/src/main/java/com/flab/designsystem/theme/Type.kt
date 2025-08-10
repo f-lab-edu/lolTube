@@ -1,4 +1,4 @@
-package com.flab.loltube.ui.theme
+package com.flab.designsystem.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

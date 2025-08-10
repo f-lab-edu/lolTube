@@ -1,4 +1,4 @@
-package com.flab.loltube.ui.main
+package com.flab.home
 
 import android.content.Context
 import android.content.Intent
@@ -11,10 +11,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.flab.designsystem.theme.LolTubeTheme
 import com.flab.domain.model.Video
-import com.flab.loltube.ui.main.component.VideoList
-import com.flab.loltube.ui.main.component.EmptyVideoList
-import com.flab.loltube.ui.theme.LolTubeTheme
+import com.flab.home.component.EmptyVideoList
+import com.flab.home.component.VideoList
 
 @Composable
 fun LolTubeVideoListRoute(

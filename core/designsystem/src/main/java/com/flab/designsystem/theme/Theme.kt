@@ -1,4 +1,4 @@
-package com.flab.loltube.ui.theme
+package com.flab.designsystem.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

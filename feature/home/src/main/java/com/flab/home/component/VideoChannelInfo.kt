@@ -1,4 +1,4 @@
-package com.flab.loltube.ui.main.component
+package com.flab.home.component
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.MaterialTheme
@@ -8,7 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import com.flab.loltube.ui.theme.LolTubeTheme
+import com.flab.designsystem.theme.LolTubeTheme
 
 @Composable
 fun VideoChannelInfo(

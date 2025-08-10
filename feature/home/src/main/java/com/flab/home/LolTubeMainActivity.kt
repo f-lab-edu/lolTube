@@ -1,4 +1,4 @@
-package com.flab.loltube.ui.main
+package com.flab.home
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.flab.loltube.ui.theme.LolTubeTheme
+import com.flab.designsystem.theme.LolTubeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

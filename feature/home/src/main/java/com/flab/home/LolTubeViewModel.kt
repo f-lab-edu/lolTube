@@ -1,4 +1,4 @@
-package com.flab.loltube.ui.main
+package com.flab.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
