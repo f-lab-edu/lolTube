@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -28,12 +29,12 @@ fun MainNavigationBar(
                 icon = {
                     Icon(
                         painter = painterResource(item.iconResId),
-                        contentDescription = item.title,
+                        contentDescription = stringResource(item.titleResId),
                         tint = Color.Unspecified
                     )
                 },
                 label = {
-                    Text(text = item.title)
+                    Text(text = stringResource(item.titleResId))
                 }
             )
         }

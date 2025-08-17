@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="empty_video_list">동영상이 없습니다</string>
+    <string name="navigation_home">홈</string>
+    <string name="navigation_shorts">쇼츠</string>
+    <string name="shorts_screen_title">쇼츠 화면</string>
+</resources>

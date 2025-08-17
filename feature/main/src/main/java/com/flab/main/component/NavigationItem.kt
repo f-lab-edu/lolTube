@@ -3,17 +3,17 @@ package com.flab.main.component
 import com.flab.main.R
 
 enum class NavigationItem(
-    val title: String,
+    val titleResId: Int,
     val route: String,
     val iconResId: Int
 ) {
     HOME(
-        title = "홈",
+        titleResId = com.flab.designsystem.R.string.navigation_home,
         route = "home",
         iconResId = R.drawable.ic_home
     ),
     SHORTS(
-        title = "쇼츠",
+        titleResId = com.flab.designsystem.R.string.navigation_shorts,
         route = "shorts",
         iconResId = R.drawable.ic_shorts
     );
