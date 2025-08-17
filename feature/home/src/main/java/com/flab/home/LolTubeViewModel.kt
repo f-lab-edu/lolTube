@@ -19,6 +19,10 @@ class LolTubeViewModel @Inject constructor(
     val videos = _videos.asStateFlow()
 
     fun fetchVideos() {
+        if (_videos.value.isNotEmpty()) {
+            return
+        }
+
         viewModelScope.launch {
             try {
                 val result = searchVideosUseCase.invoke(

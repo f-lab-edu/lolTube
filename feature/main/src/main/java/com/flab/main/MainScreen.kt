@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -35,8 +36,29 @@ fun MainRoute() {
         onNavigationItemSelected = { index ->
             selectedIndex = index
             when (index) {
-                0 -> navController.navigate("home")
-                1 -> navController.navigate("shorts")
+                0 -> {
+                    if (navController.currentDestination?.route != "home") {
+                        navController.navigate("home") {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                }
+
+                1 -> {
+                    if (navController.currentDestination?.route != "shorts") {
+                        navController.navigate("shorts") {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                }
             }
         },
         navController = navController
