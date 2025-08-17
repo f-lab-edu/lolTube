@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -25,26 +26,39 @@ import com.flab.main.component.MainNavigationBar
 import com.flab.main.component.NavigationItem
 
 @Composable
-fun MainScreen() {
+fun MainRoute() {
+    var selectedIndex by remember { mutableIntStateOf(0) }
+    val navController = rememberNavController()
+
+    MainScreen(
+        selectedIndex = selectedIndex,
+        onNavigationItemSelected = { index ->
+            selectedIndex = index
+            when (index) {
+                0 -> navController.navigate("home")
+                1 -> navController.navigate("shorts")
+            }
+        },
+        navController = navController
+    )
+}
+
+@Composable
+fun MainScreen(
+    selectedIndex: Int,
+    onNavigationItemSelected: (Int) -> Unit,
+    navController: NavHostController
+) {
     val navigationItems = listOf(
         NavigationItem.HOME,
         NavigationItem.SHORTS
     )
 
-    var selectedIndex by remember { mutableIntStateOf(0) }
-    val navController = rememberNavController()
-
     Scaffold(
         bottomBar = {
             MainNavigationBar(
                 selectedIndex = selectedIndex,
-                onItemSelected = { index ->
-                    selectedIndex = index
-                    when (index) {
-                        0 -> navController.navigate("home")
-                        1 -> navController.navigate("shorts")
-                    }
-                },
+                onItemSelected = onNavigationItemSelected,
                 navigationItems = navigationItems
             )
         }
@@ -77,7 +91,7 @@ fun MainScreen() {
 fun MainScreenPreview() {
     MaterialTheme {
         Surface {
-            MainScreen()
+            MainRoute()
         }
     }
 }
