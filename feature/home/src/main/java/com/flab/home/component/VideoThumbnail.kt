@@ -1,4 +1,4 @@
-package com.flab.loltube.ui.main.component
+package com.flab.home.component
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,7 +9,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.flab.loltube.ui.theme.LolTubeTheme
+import com.flab.designsystem.theme.LolTubeTheme
 
 @Composable
 fun VideoThumbnail(

@@ -1,4 +1,4 @@
-package com.flab.loltube.ui.theme
+package com.flab.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 

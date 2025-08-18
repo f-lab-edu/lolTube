@@ -1,4 +1,4 @@
-package com.flab.loltube.ui.main.component
+package com.flab.home.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,13 +9,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.flab.loltube.R
-import com.flab.loltube.ui.theme.LolTubeTheme
+import com.flab.designsystem.theme.LolTubeTheme
+import com.flab.designsystem.R
 
 @Composable
 fun EmptyVideoList(
     modifier: Modifier = Modifier,
-    message: String = stringResource(R.string.empty_video_list)
+    message: String = stringResource(id = R.string.empty_video_list)
 ) {
     Box(
         modifier = modifier.fillMaxSize(),

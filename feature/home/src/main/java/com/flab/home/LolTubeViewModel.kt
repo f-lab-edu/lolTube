@@ -1,4 +1,4 @@
-package com.flab.loltube.ui.main
+package com.flab.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,6 +19,10 @@ class LolTubeViewModel @Inject constructor(
     val videos = _videos.asStateFlow()
 
     fun fetchVideos() {
+        if (_videos.value.isNotEmpty()) {
+            return
+        }
+
         viewModelScope.launch {
             try {
                 val result = searchVideosUseCase.invoke(
