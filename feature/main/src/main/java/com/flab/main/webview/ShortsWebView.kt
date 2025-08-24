@@ -1,161 +1,82 @@
 package com.flab.main.webview
 
 import android.annotation.SuppressLint
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
-import android.view.View
+import android.util.Log
 import android.view.ViewGroup
+import android.webkit.WebView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun ShortsWebView() {
-    val context = LocalContext.current
-    var isPlaying by remember { mutableStateOf(false) }
-    var webView: WebView? by remember { mutableStateOf(null) }
+fun ShortsWebView(videoId: String) {
+    var isVideoReady by remember { mutableStateOf(false) }
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { ctx ->
-                WebView(ctx).apply {
+            factory = { context ->
+                WebView(context).apply {
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
                     )
 
-                    webViewClient = object : WebViewClient() {
-                        override fun onPageFinished(view: WebView?, url: String?) {
-                            super.onPageFinished(view, url)
-                        }
+                    settings.javaScriptEnabled = true
+                    settings.mediaPlaybackRequiresUserGesture = false
 
-                        @Deprecated("Deprecated in Java", ReplaceWith("false"))
-                        override fun shouldOverrideUrlLoading(
-                            view: WebView?,
-                            url: String?
-                        ): Boolean {
-                            return false
-                        }
-                    }
+                    settings.domStorageEnabled = true
+                    settings.allowContentAccess = true
+                    settings.allowFileAccess = true
+                    settings.mixedContentMode =
+                        android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                    settings.cacheMode = android.webkit.WebSettings.LOAD_DEFAULT
 
-                    webChromeClient = object : WebChromeClient() {
-                        override fun onConsoleMessage(consoleMessage: android.webkit.ConsoleMessage?): Boolean {
-                            return super.onConsoleMessage(consoleMessage)
-                        }
-
-                        override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
-                            super.onShowCustomView(view, callback)
-                        }
-
-                        override fun onHideCustomView() {
-                            super.onHideCustomView()
-                        }
-                    }
-
-                    settings.apply {
-                        javaScriptEnabled = true
-                        javaScriptCanOpenWindowsAutomatically = true
-
-                        domStorageEnabled = true
-                        databaseEnabled = true
-
-                        allowFileAccess = true
-                        allowContentAccess = true
-                        allowUniversalAccessFromFileURLs = true
-                        allowFileAccessFromFileURLs = true
-
-                        mediaPlaybackRequiresUserGesture = false
-
-                        mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-
-                        cacheMode = android.webkit.WebSettings.LOAD_DEFAULT
-
-                        useWideViewPort = true
-                        loadWithOverviewMode = true
-
-                        userAgentString += " ShortsWebView/1.0"
-
-                        setSupportZoom(false)
-                        builtInZoomControls = false
-                        displayZoomControls = false
-
-                        setSupportMultipleWindows(false)
-                        setGeolocationEnabled(false)
-                    }
-
-                    setLayerType(View.LAYER_TYPE_HARDWARE, null)
-
-                    setBackgroundColor(0x00000000)
+                    setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
 
                     addJavascriptInterface(
                         WebViewInterface(
-                            onVideoPlay = {
-                                isPlaying = true
+                            onPlayerStateChange = { state ->
                             },
-                            onVideoPause = {
-                                isPlaying = false
+                            onPlayerClicked = { isPlaying ->
                             },
-                            onVideoEnd = {
-                                isPlaying = false
+                            onVideoReady = {
+                                isVideoReady = true
                             }
                         ),
                         "AndroidInterface"
                     )
 
-                    loadUrl("file:///android_asset/youtube_shorts.html")
-                    webView = this
+                    loadUrl("file:///android_asset/youtube_shorts.html?videoId=$videoId&mute=0")
                 }
             },
-            update = { view ->
-                view.layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-            }
+            modifier = Modifier.fillMaxSize()
         )
-    }
 
-    DisposableEffect(Unit) {
-        onDispose {
-            webView?.apply {
-                clearHistory()
-                clearCache(true)
-                loadUrl("about:blank")
-                onPause()
-                removeAllViews()
-                destroy()
+        if (!isVideoReady) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+                    .zIndex(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         }
     }
-}
-
-fun playVideo(webView: WebView?) {
-    webView?.evaluateJavascript("playVideo()", null)
-}
-
-fun pauseVideo(webView: WebView?) {
-    webView?.evaluateJavascript("pauseVideo()", null)
-}
-
-fun toggleVideo(webView: WebView?) {
-    webView?.evaluateJavascript("toggleVideo()", null)
-}
-
-fun setVideoState(webView: WebView?, playing: Boolean) {
-    webView?.evaluateJavascript("setVideoState($playing)", null)
 }

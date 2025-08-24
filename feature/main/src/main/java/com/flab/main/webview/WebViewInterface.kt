@@ -3,23 +3,23 @@ package com.flab.main.webview
 import android.webkit.JavascriptInterface
 
 class WebViewInterface(
-    private val onVideoPlay: () -> Unit,
-    private val onVideoPause: () -> Unit,
-    private val onVideoEnd: () -> Unit
+    private val onPlayerStateChange: (Int) -> Unit = {},
+    private val onPlayerClicked: (Boolean) -> Unit = {},
+    private val onVideoReady: () -> Unit = {}
 ) {
 
     @JavascriptInterface
-    fun onVideoPlay() {
-        onVideoPlay.invoke()
+    fun onPlayerStateChange(state: Int) {
+        onPlayerStateChange.invoke(state)
     }
 
     @JavascriptInterface
-    fun onVideoPause() {
-        onVideoPause.invoke()
+    fun onPlayerClicked(isPlaying: Boolean) {
+        onPlayerClicked.invoke(isPlaying)
     }
 
     @JavascriptInterface
-    fun onVideoEnd() {
-        onVideoEnd.invoke()
+    fun onVideoReady() {
+        onVideoReady.invoke()
     }
 }

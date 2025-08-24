@@ -92,7 +92,7 @@ fun MainScreen(
                 LolTubeVideoListRoute()
             }
             composable("shorts") {
-                ShortsWebView()
+                ShortsWebView(videoId = "Cmb2plgG328")
             }
         }
     }

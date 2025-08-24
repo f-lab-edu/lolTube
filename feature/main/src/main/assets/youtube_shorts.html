@@ -1,377 +1,142 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Shorts</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; }
         html, body {
             width: 100vw;
             height: 100vh;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #000;
-            color: white;
+            background: black;
             overflow: hidden;
-            user-select: none;
+            -webkit-tap-highlight-color: transparent !important;
+            touch-action: manipulation;
         }
-
-        .container {
+        #player-container {
+            position: relative;
             width: 100vw;
             height: 100vh;
-            background: #000;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .video-container {
-            width: 100%;
-            height: 100%;
-            background: #000;
-            position: relative;
+            background: black;
             overflow: hidden;
         }
-
-        .video-player {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            background: #000;
+        #player {
             position: absolute;
+            width: 120vw;
+            height: 120vh;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: none;
+            background: black;
+        }
+        /* 클릭영역 오버레이 */
+        #click-overlay {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
             top: 0;
             left: 0;
             z-index: 10;
-        }
-
-        .video-overlay {
-            width: 100%;
-            height: 100%;
             background: transparent;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 20;
-            pointer-events: none;
-        }
-
-        .play-button {
-            width: 100px;
-            height: 100px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            pointer-events: auto;
-            opacity: 0;
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+            -webkit-user-select: none;
+            user-select: none;
         }
-
-        .play-button.show {
-            opacity: 1;
-        }
-
-        .play-button:hover {
-            background: rgba(255, 255, 255, 1);
-            transform: scale(1.05);
-        }
-
-        .play-button:active {
-            transform: scale(0.95);
-        }
-
-        .play-icon {
-            width: 0;
-            height: 0;
-            border-left: 30px solid #333;
-            border-top: 20px solid transparent;
-            border-bottom: 20px solid transparent;
-            margin-left: 8px;
-        }
-
-        .pause-icon {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .pause-icon::before,
-        .pause-icon::after {
-            content: '';
-            width: 6px;
-            height: 30px;
-            background: #333;
-            margin: 0 3px;
-        }
-
-        .hidden {
-            display: none !important;
+        #click-overlay:focus, #click-overlay:active {
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
         }
     </style>
 </head>
 <body>
-<div class="container" id="container">
-    <div class="video-container" id="videoContainer">
-        <!-- 실제 비디오 플레이어 -->
-        <video
-                id="realVideo"
-                class="video-player"
-                preload="auto"
-                playsinline
-                webkit-playsinline
-                poster="https://placehold.co/720x1280/000000/000000.png">
-            <!-- Source will be set dynamically from the video list in JavaScript -->
-            <p>Your browser does not support HTML5 video.</p>
-        </video>
-
-        <!-- 비디오 오버레이 -->
-        <div class="video-overlay" id="videoOverlay">
-            <div class="play-button" id="playButton">
-                <div class="play-icon" id="playIcon"></div>
-            </div>
-        </div>
-    </div>
+<div id="player-container">
+    <div id="player"></div>
+    <div id="click-overlay"></div>
 </div>
-
+<script src="https://www.youtube.com/iframe_api"></script>
 <script>
-    // 롤 관련 쇼츠 영상 목록 (예시 URL입니다. 원하시는 영상으로 교체하세요)
-    const videos = [
-        'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-        'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-        'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-        'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4'
-    ];
-    let currentVideoIndex = 0;
-
+    const params = new URLSearchParams(window.location.search);
+    const videoId = params.get("videoId") || "dQw4w9WgXcQ";
+    let player;
     let isPlaying = false;
-    let videoElement = null;
-    const playButton = document.getElementById('playButton');
-    const playIcon = document.getElementById('playIcon');
-    const container = document.getElementById('container');
-    const overlay = document.getElementById('videoOverlay');
-    const realVideo = document.getElementById('realVideo');
+    let hasVideoVisiblyStarted = false;
 
-    function initializeVideo() {
-        videoElement = realVideo;
+    window.onYouTubeIframeAPIReady = function() {
+        player = new YT.Player('player', {
+            height: '100%',
+            width: '100%',
+            videoId: videoId,
+            playerVars: {
+                'autoplay': 1,
+                'controls': 0,
+                'playsinline': 1,
+                'rel': 0
+            },
+            events: {
+                'onReady': function(e) {
+                    isPlaying = true;
+                    console.log('Player ready');
+                },
+                'onStateChange': function(e) {
+                    console.log('State changed to:', e.data);
+                    // 상태 업데이트
+                    isPlaying = (e.data === YT.PlayerState.PLAYING);
 
-        console.log('Video element:', videoElement);
-
-        // 비디오 이벤트 리스너
-        videoElement.addEventListener('loadstart', () => {
-            console.log('Video load started');
-        });
-
-        videoElement.addEventListener('loadeddata', () => {
-            console.log('Video data loaded');
-        });
-
-        videoElement.addEventListener('loadedmetadata', () => {
-            console.log('Video metadata loaded - Duration:', videoElement.duration);
-            console.log('Video dimensions:', videoElement.videoWidth, 'x', videoElement.videoHeight);
-        });
-
-        videoElement.addEventListener('canplay', () => {
-            console.log('Video can play, attempting to play automatically.');
-            // 비디오가 준비되면 바로 재생 시도
-            playVideo();
-        });
-
-        videoElement.addEventListener('play', () => {
-            isPlaying = true;
-            updateUI();
-            console.log('Video play event - currentTime:', videoElement.currentTime);
-            if (window.AndroidInterface) {
-                window.AndroidInterface.onVideoPlay();
+                    // 최초 재생 시작 시에만 네이티브에 알림 (중복 방지)
+                    if (e.data === YT.PlayerState.PLAYING && !hasVideoVisiblyStarted) {
+                        hasVideoVisiblyStarted = true;
+                        console.log('Video visibly started, notifying native');
+                        if (typeof AndroidInterface !== 'undefined') {
+                            AndroidInterface.onVideoReady();
+                        }
+                    }
+                    
+                    // 영상이 끝나면 자동으로 처음부터 재생
+                    if (e.data === YT.PlayerState.ENDED) {
+                        console.log('Video ended, immediately restarting');
+                        player.seekTo(0);
+                        player.playVideo();
+                        hasVideoVisiblyStarted = false; // 다음 반복을 위해 리셋
+                    }
+                    
+                    if (typeof AndroidInterface !== 'undefined') {
+                        AndroidInterface.onPlayerStateChange(e.data);
+                    }
+                }
             }
         });
-
-        videoElement.addEventListener('pause', () => {
+    };
+    
+    // 클릭 시 재생/정지 토글
+    document.getElementById('click-overlay').addEventListener('click', function(e) {
+        if (!player) return;
+        
+        // 포커스 제거 (파란색 피드백 방지)
+        this.blur();
+        
+        console.log('Click detected, isPlaying:', isPlaying);
+        
+        if (isPlaying) {
+            // 재생 중인 경우: 정지
+            console.log('Pausing video');
+            player.pauseVideo();
             isPlaying = false;
-            updateUI();
-            console.log('Video pause event');
-            if (window.AndroidInterface) {
-                window.AndroidInterface.onVideoPause();
-            }
-        });
-
-        videoElement.addEventListener('ended', () => {
-            console.log('Video ended event, playing next video.');
-            if (window.AndroidInterface) {
-                window.AndroidInterface.onVideoEnd();
-            }
-            playNextVideo(); // 비디오가 끝나면 다음 비디오 재생
-        });
-
-        videoElement.addEventListener('error', (e) => {
-            const error = videoElement.error;
-            console.error('Video error:', error);
-        });
-
-        // 초기 비디오 로드
-        loadVideo(currentVideoIndex);
-
-        console.log('Video initialization complete');
-    }
-
-    function updateUI() {
-        if (isPlaying) {
-            playIcon.className = 'pause-icon';
-            playButton.classList.remove('show');
-            console.log('UI updated: showing video');
         } else {
-            playIcon.className = 'play-icon';
-            playButton.classList.add('show');
-            console.log('UI updated: showing placeholder');
+            // 정지 중인 경우: 재생
+            console.log('Playing video');
+            player.playVideo();
         }
-    }
-
-    function loadVideo(index) {
-        // 재생목록 순환
-        if (index >= videos.length) {
-            index = 0;
-        } else if (index < 0) {
-            index = videos.length - 1;
-        }
-        currentVideoIndex = index;
-
-        isPlaying = false;
-        playButton.classList.remove('show'); // 새 비디오 로드 시 플레이 버튼 숨김
-
-        videoElement.src = videos[currentVideoIndex];
-        videoElement.load();
-        console.log(`Loading video ${currentVideoIndex}: ${videos[currentVideoIndex]}`);
-    }
-
-    function playNextVideo() {
-        loadVideo(currentVideoIndex + 1);
-    }
-
-    function playPreviousVideo() {
-        loadVideo(currentVideoIndex - 1);
-    }
-
-    function playVideo() {
-        if (videoElement) {
-            console.log('Attempting to play video...');
-            videoElement.play().then(() => {
-                console.log('Play video called - success');
-            }).catch(error => {
-                console.log('Play video failed, showing play button:', error);
-                // 자동재생 실패 시 사용자가 직접 누를 수 있도록 버튼 표시
-                isPlaying = false;
-                updateUI();
-            });
-        } else {
-            console.log('Video element not ready');
-        }
-    }
-
-    function pauseVideo() {
-        if (videoElement && !videoElement.paused) {
-            videoElement.pause();
-            console.log('Pause video called');
-        }
-    }
-
-    function toggleVideo() {
-        console.log('Toggle video called - current playing state:', isPlaying);
-        if (isPlaying) {
-            pauseVideo();
-        } else {
-            playVideo();
-        }
-    }
-
-    // Android에서 호출할 수 있는 함수들
-    window.setVideoState = function(playing) {
-        if (playing) {
-            playVideo();
-        } else {
-            pauseVideo();
-        }
-    };
-
-    window.simulateVideoEnd = function() {
-        if (videoElement) {
-            videoElement.currentTime = videoElement.duration - 0.1;
-        }
-    };
-
-    // 플레이 버튼 클릭 이벤트
-    playButton.addEventListener('click', toggleVideo);
-
-    // 터치 이벤트로 재생/일시정지 및 스와이프
-    let touchStartY = 0;
-    let touchMoveY = 0;
-    let touchStartTime = 0;
-
-    document.addEventListener('touchstart', function(e) {
-        touchStartTime = Date.now();
-        touchStartY = e.touches[0].clientY;
-        touchMoveY = touchStartY;
-    });
-
-    document.addEventListener('touchmove', function(e) {
-        // 스크롤 등 기본 동작 방지
-        e.preventDefault();
-        touchMoveY = e.touches[0].clientY;
-    });
-
-    document.addEventListener('touchend', function(e) {
-        const touchDuration = Date.now() - touchStartTime;
-        const deltaY = touchMoveY - touchStartY;
-        const swipeThreshold = 50; // 50px 이상 움직이면 스와이프로 간주
-        const tapThreshold = 200; // 200ms 안에 터치가 끝나면 탭으로 간주
-
-        // 스와이프 감지
-        if (Math.abs(deltaY) > swipeThreshold) {
-            // 아래로 스와이프 (다음 영상)
-            if (deltaY > 0) {
-                console.log('Swipe Down -> Next Video');
-                playNextVideo();
-            }
-            // 위로 스와이프 (이전 영상)
-            else {
-                console.log('Swipe Up -> Previous Video');
-                playPreviousVideo();
-            }
-        }
-        // 탭 감지
-        else if (touchDuration < tapThreshold) {
-            console.log('Tap detected, toggling video play/pause');
-            toggleVideo();
+        
+        // 네이티브로 클릭 이벤트 콜백
+        if (typeof AndroidInterface !== 'undefined') {
+            AndroidInterface.onPlayerClicked(!isPlaying); // 변경될 상태로 전달
         }
     });
-
-    // 초기화
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM Content Loaded');
-        initializeVideo();
-    });
-
-    // 페이지 로드 완료 후 초기화
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeVideo);
-    } else {
-        console.log('Document already ready, initializing immediately');
-        initializeVideo();
-    }
 </script>
 </body>
 </html>
+
