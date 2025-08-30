@@ -138,7 +138,15 @@ fun ShortsWebView(
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            webViewRef?.let { webView ->
+                webView.clearCache(true)
+                webView.clearHistory()
+                webView.removeAllViews()
+                webView.destroy()
+            }
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
