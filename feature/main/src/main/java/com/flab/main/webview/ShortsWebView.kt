@@ -1,11 +1,16 @@
 package com.flab.main.webview
 
 import android.util.Log
+import android.webkit.WebView
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 
 private const val TAG = "ShortsWebView"
@@ -62,11 +67,22 @@ fun ShortsWebView(
     onPlayerClicked: ((Boolean) -> Unit)? = null,
     onVideoReady: (() -> Unit)? = null
 ) {
+    var isVideoReady by remember(videoId) { mutableStateOf(false) }
+    var webViewRef by remember(videoId) { mutableStateOf<WebView?>(null) }
+
     ShortsPlayer(
         videoId = videoId,
         isActive = isActive,
+        isVideoReady = isVideoReady,
+        webViewRef = webViewRef,
+        onWebViewCreated = { webView ->
+            webViewRef = webView
+        },
         onPlayerStateChange = onPlayerStateChange,
         onPlayerClicked = onPlayerClicked,
-        onVideoReady = onVideoReady
+        onVideoReady = {
+            isVideoReady = true
+            onVideoReady?.invoke()
+        }
     )
 }

@@ -26,28 +26,31 @@ private const val TAG = "ShortsPlayer"
 fun ShortsPlayer(
     videoId: String,
     isActive: Boolean = true,
+    isVideoReady: Boolean,
+    webViewRef: WebView?,
+    onWebViewCreated: (WebView) -> Unit,
     onPlayerStateChange: ((Int) -> Unit)? = null,
     onPlayerClicked: ((Boolean) -> Unit)? = null,
     onVideoReady: (() -> Unit)? = null
 ) {
-    var isVideoReady by remember { mutableStateOf(false) }
-    var webViewRef by remember { mutableStateOf<WebView?>(null) }
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(isActive) {
-        if (isActive) {
-            Log.d(TAG, "Page activated, playing video: $videoId")
-            webViewRef?.evaluateJavascript("if(window.player){ player.playVideo(); }", null)
-        } else {
-            Log.d(TAG, "Page deactivated, pausing video: $videoId")
-            webViewRef?.evaluateJavascript(
-                "if(window.player){ player.pauseVideo(); player.mute(); }",
-                null
-            )
+    LaunchedEffect(isActive, webViewRef) {
+        webViewRef?.let { webView ->
+            if (isActive) {
+                Log.d(TAG, "Page activated, playing video: $videoId")
+                webView.evaluateJavascript("if(window.player){ player.playVideo(); }", null)
+            } else {
+                Log.d(TAG, "Page deactivated, pausing video: $videoId")
+                webView.evaluateJavascript(
+                    "if(window.player){ player.pauseVideo(); player.mute(); }",
+                    null
+                )
+            }
         }
     }
 
-    LaunchedEffect(videoId, isActive) {
+    LaunchedEffect(videoId, isActive, webViewRef) {
         if (!isActive) {
             webViewRef?.evaluateJavascript(
                 "if(window.player){ player.pauseVideo(); player.stopVideo(); }",
@@ -56,7 +59,7 @@ fun ShortsPlayer(
         }
     }
 
-    DisposableEffect(lifecycleOwner) {
+    DisposableEffect(lifecycleOwner, webViewRef) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_RESUME -> {
@@ -98,15 +101,16 @@ fun ShortsPlayer(
                     onPlayerClicked = onPlayerClicked,
                     onVideoReady = {
                         Log.d(TAG, "Video $videoId - ready, hiding loading")
-                        isVideoReady = true
                         onVideoReady?.invoke()
                     }
                 ).also { webView ->
-                    webViewRef = webView
+                    onWebViewCreated(webView)
                 }
             },
             modifier = Modifier.fillMaxSize(),
-            update = { webViewRef = it }
+            update = { webView ->
+                onWebViewCreated(webView)
+            }
         )
 
         if (!isVideoReady) {
