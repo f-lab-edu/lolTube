@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Shorts Player</title>
+    <style>
+        * { margin: 0; padding: 0; }
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            background: black;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent !important;
+            touch-action: manipulation;
+        }
+        #player-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: black;
+            overflow: hidden;
+        }
+        #player {
+            position: absolute;
+            width: 120vw;
+            height: 120vh;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: none;
+            background: black;
+        }
+        /* 클릭영역 오버레이 */
+        #click-overlay {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            background: transparent;
+            cursor: pointer;
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        #click-overlay:focus, #click-overlay:active {
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+        }
+    </style>
+</head>
+<body>
+<div id="player-container">
+    <div id="player"></div>
+    <div id="click-overlay"></div>
+</div>
+<!-- sonar-disable-next-line Web:S5725 -->
+<script src="https://www.youtube.com/iframe_api"
+        integrity="sha384-oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/uxy9rx7HNQlGYl1kPzQho1wx4JwY8wC"
+></script>
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const videoId = params.get("videoId") || "dQw4w9WgXcQ";
+    let player;
+    let isPlaying = false;
+    let hasVideoVisiblyStarted = false;
+
+    window.onYouTubeIframeAPIReady = function() {
+        player = new YT.Player('player', {
+            height: '100%',
+            width: '100%',
+            videoId: videoId,
+            playerVars: {
+                'autoplay': 1,
+                'controls': 0,
+                'playsinline': 1,
+                'rel': 0
+            },
+            events: {
+                'onReady': function(e) {
+                    isPlaying = true;
+                    console.log('Player ready');
+                },
+                'onStateChange': function(e) {
+                    console.log('State changed to:', e.data);
+                    // 상태 업데이트
+                    isPlaying = (e.data === YT.PlayerState.PLAYING);
+
+                    // 최초 재생 시작 시에만 네이티브에 알림 (중복 방지)
+                    if (e.data === YT.PlayerState.PLAYING && !hasVideoVisiblyStarted) {
+                        hasVideoVisiblyStarted = true;
+                        console.log('Video visibly started, notifying native');
+                        if (typeof AndroidInterface !== 'undefined') {
+                            AndroidInterface.onVideoReady();
+                        }
+                    }
+                    
+                    // 영상이 끝나면 자동으로 처음부터 재생
+                    if (e.data === YT.PlayerState.ENDED) {
+                        console.log('Video ended, immediately restarting');
+                        player.seekTo(0);
+                        player.playVideo();
+                        hasVideoVisiblyStarted = false; // 다음 반복을 위해 리셋
+                    }
+                    
+                    if (typeof AndroidInterface !== 'undefined') {
+                        AndroidInterface.onPlayerStateChange(e.data);
+                    }
+                }
+            }
+        });
+    };
+    
+    // 클릭 시 재생/정지 토글
+    document.getElementById('click-overlay').addEventListener('click', function(e) {
+        if (!player) return;
+        
+        // 포커스 제거 (파란색 피드백 방지)
+        this.blur();
+        
+        console.log('Click detected, isPlaying:', isPlaying);
+        
+        if (isPlaying) {
+            // 재생 중인 경우: 정지
+            console.log('Pausing video');
+            player.pauseVideo();
+            isPlaying = false;
+        } else {
+            // 정지 중인 경우: 재생
+            console.log('Playing video');
+            player.playVideo();
+        }
+        
+        // 네이티브로 클릭 이벤트 콜백
+        if (typeof AndroidInterface !== 'undefined') {
+            AndroidInterface.onPlayerClicked(!isPlaying); // 변경될 상태로 전달
+        }
+    });
+</script>
+</body>
+</html>
+
