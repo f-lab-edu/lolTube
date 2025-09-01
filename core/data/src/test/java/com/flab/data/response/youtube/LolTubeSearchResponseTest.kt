@@ -1,5 +1,11 @@
 package com.flab.data.response.youtube
 
+import com.flab.network.response.youtube.LolTubeSearchResponse
+import com.flab.network.response.youtube.ThumbnailDetail
+import com.flab.network.response.youtube.Thumbnails
+import com.flab.network.response.youtube.VideoId
+import com.flab.network.response.youtube.VideoItem
+import com.flab.network.response.youtube.VideoSnippet
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
