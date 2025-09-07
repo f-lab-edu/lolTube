@@ -1,4 +1,4 @@
-package com.flab.main.webview
+package com.flab.shorts.webview
 
 import android.util.Log
 import android.webkit.WebView

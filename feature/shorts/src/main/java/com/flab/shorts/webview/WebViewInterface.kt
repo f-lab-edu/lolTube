@@ -1,4 +1,4 @@
-package com.flab.main.webview
+package com.flab.shorts.webview
 
 import android.webkit.JavascriptInterface
 
