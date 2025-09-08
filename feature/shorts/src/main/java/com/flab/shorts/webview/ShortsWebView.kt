@@ -6,14 +6,39 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.flab.shorts.ShortsViewModel
+import androidx.hilt.navigation.compose.hiltViewModel as hiltViewModel1
 
 private const val TAG = "ShortsWebView"
+
+@Composable
+fun ShortsRoute(
+    viewModel: ShortsViewModel = hiltViewModel1()
+) {
+    val shortsVideos by viewModel.shortsVideoIds.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        if (shortsVideos.isEmpty()) {
+            viewModel.fetchShortsVideos()
+        }
+    }
+
+    val videoIds = shortsVideos.map { it.videoId }
+
+    if (videoIds.isNotEmpty()) {
+        ShortsPager(
+            videoIds = videoIds
+        )
+    }
+}
 
 @Composable
 fun ShortsPager(
@@ -69,20 +94,44 @@ fun ShortsWebView(
 ) {
     var isVideoReady by remember(videoId) { mutableStateOf(false) }
     var webViewRef by remember(videoId) { mutableStateOf<WebView?>(null) }
+    var isWebViewDestroyed by remember(videoId) { mutableStateOf(false) }
+
+    DisposableEffect(videoId) {
+        onDispose {
+            isWebViewDestroyed = true
+            webViewRef?.let { webView ->
+                try {
+                    webView.stopLoading()
+                    webView.clearCache(true)
+                    webView.clearHistory()
+                    webView.removeAllViews()
+                    (webView.parent as? android.view.ViewGroup)?.removeView(webView)
+                    webView.destroy()
+                } catch (e: Exception) {
+                    Log.w(TAG, "Error destroying WebView: ${e.message}")
+                }
+                webViewRef = null
+            }
+        }
+    }
 
     ShortsPlayer(
         videoId = videoId,
         isActive = isActive,
         isVideoReady = isVideoReady,
-        webViewRef = webViewRef,
+        webViewRef = if (isWebViewDestroyed) null else webViewRef,
         onWebViewCreated = { webView ->
-            webViewRef = webView
+            if (!isWebViewDestroyed) {
+                webViewRef = webView
+            }
         },
         onPlayerStateChange = onPlayerStateChange,
         onPlayerClicked = onPlayerClicked,
         onVideoReady = {
-            isVideoReady = true
-            onVideoReady?.invoke()
+            if (!isWebViewDestroyed) {
+                isVideoReady = true
+                onVideoReady?.invoke()
+            }
         }
     )
 }
