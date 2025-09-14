@@ -15,13 +15,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.flab.shorts.ShortsViewModel
-import androidx.hilt.navigation.compose.hiltViewModel as hiltViewModel1
+import androidx.hilt.navigation.compose.hiltViewModel
 
 private const val TAG = "ShortsWebView"
 
 @Composable
 fun ShortsRoute(
-    viewModel: ShortsViewModel = hiltViewModel1()
+    viewModel: ShortsViewModel = hiltViewModel()
 ) {
     val shortsVideos by viewModel.shortsVideoIds.collectAsStateWithLifecycle()
 
