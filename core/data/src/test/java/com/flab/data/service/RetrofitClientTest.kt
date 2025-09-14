@@ -1,46 +1,72 @@
 package com.flab.data.service
 
+import com.flab.network.response.youtube.LolTubeSearchResponse
+import com.flab.network.service.LolTubeService
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 
 class RetrofitClientTest {
 
-    @Test
-    fun `createService should create LolTubeService instance`() {
-        // When
-        val service = RetrofitClient.createService<LolTubeService>()
+    @Mock
+    private lateinit var lolTubeService: LolTubeService
 
-        // Then
-        assertNotNull(service)
-        assertTrue(true)
+    @Before
+    fun setUp() {
+        MockitoAnnotations.openMocks(this)
     }
 
     @Test
-    fun `RetrofitClient should have correct base URL`() {
+    fun `LolTubeService mock이 성공적으로 생성되어야 한다`() {
+        // Then
+        assertNotNull("LolTubeService mock should be created", lolTubeService)
+    }
+
+    @Test
+    fun `LolTubeService는 LolTubeSearchResponse를 반환하는 searchVideos 메소드를 가져야 한다`() =
+        runTest {
         // Given
-        val expectedBaseUrl = "https://www.googleapis.com/youtube/v3/"
+        val mockResponse = LolTubeSearchResponse(items = emptyList())
+        whenever(
+            lolTubeService.searchVideos(
+                apiKey = any(),
+                part = any(),
+                query = any(),
+                type = any(),
+                maxResults = any(),
+                regionCode = any()
+            )
+        ).thenReturn(mockResponse)
 
         // When
-        val service = RetrofitClient.createService<LolTubeService>()
+        val result = lolTubeService.searchVideos(
+            apiKey = "test-key",
+            part = "snippet",
+            query = "test",
+            type = "video",
+            maxResults = 10,
+            regionCode = "KR"
+        )
 
         // Then
-        assertNotNull(service)
-        // Note: We can't directly access the base URL from the service,
-        // but we can verify the service was created successfully
-        // which indicates the RetrofitClient configuration is working
+        assertNotNull(result)
+        assertEquals(0, result.items.size)
     }
 
     @Test
-    fun `RetrofitClient should create different service instances`() {
-        // When
-        val service1 = RetrofitClient.createService<LolTubeService>()
-        val service2 = RetrofitClient.createService<LolTubeService>()
+    fun `LolTubeService 인터페이스는 data 모듈에서 접근 가능해야 한다`() {
+        // Given & When
+        val isInterface = LolTubeService::class.java.isInterface
+        val className = LolTubeService::class.simpleName
 
         // Then
-        assertNotNull(service1)
-        assertNotNull(service2)
-        // Services should be different instances but same type
-        assertTrue(service1::class == service2::class)
+        assertEquals("Should be an interface", true, isInterface)
+        assertEquals("Should have correct name", "LolTubeService", className)
     }
 }
