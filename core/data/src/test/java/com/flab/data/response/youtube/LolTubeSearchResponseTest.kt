@@ -13,7 +13,7 @@ import org.junit.Test
 class LolTubeSearchResponseTest {
 
     @Test
-    fun `LolTubeSearchResponse should be created with items`() {
+    fun `LolTubeSearchResponse는 아이템과 함께 생성되어야 한다`() {
         // Given
         val videoItems = listOf(
             VideoItem(
@@ -36,7 +36,7 @@ class LolTubeSearchResponseTest {
     }
 
     @Test
-    fun `VideoItem should be created with id and snippet`() {
+    fun `VideoItem은 id와 snippet으로 생성되어야 한다`() {
         // Given
         val videoId = VideoId("sampleVideoId")
         val snippet = VideoSnippet(
@@ -56,7 +56,7 @@ class LolTubeSearchResponseTest {
     }
 
     @Test
-    fun `VideoId should handle null videoId`() {
+    fun `VideoId는 null videoId를 처리해야 한다`() {
         // When
         val videoId = VideoId(videoId = null)
 
@@ -65,7 +65,7 @@ class LolTubeSearchResponseTest {
     }
 
     @Test
-    fun `VideoSnippet should be created with all properties`() {
+    fun `VideoSnippet은 모든 속성과 함께 생성되어야 한다`() {
         // Given
         val title = "Test Title"
         val channelTitle = "Test Channel"
@@ -85,7 +85,7 @@ class LolTubeSearchResponseTest {
     }
 
     @Test
-    fun `Thumbnails should handle null high thumbnail`() {
+    fun `Thumbnails는 null high thumbnail을 처리해야 한다`() {
         // When
         val thumbnails = Thumbnails(high = null)
 
@@ -94,7 +94,7 @@ class LolTubeSearchResponseTest {
     }
 
     @Test
-    fun `ThumbnailDetail should be created with url`() {
+    fun `ThumbnailDetail은 url과 함께 생성되어야 한다`() {
         // Given
         val url = "https://example.com/thumbnail.jpg"
 
@@ -106,7 +106,7 @@ class LolTubeSearchResponseTest {
     }
 
     @Test
-    fun `data classes should support equality comparison`() {
+    fun `data class들은 동등성 비교를 지원해야 한다`() {
         // Given
         val thumbnailDetail1 = ThumbnailDetail("https://test.com/image.jpg")
         val thumbnailDetail2 = ThumbnailDetail("https://test.com/image.jpg")

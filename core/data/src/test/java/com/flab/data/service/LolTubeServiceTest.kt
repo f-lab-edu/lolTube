@@ -28,7 +28,7 @@ class LolTubeServiceTest {
     }
 
     @Test
-    fun `searchVideos should return LolTubeSearchResponse with video items`() = runTest {
+    fun `searchVideos는 비디오 아이템이 포함된 LolTubeSearchResponse를 반환해야 한다`() = runTest {
         // Given
         val expectedResponse = LolTubeSearchResponse(
             items = listOf(
@@ -76,7 +76,7 @@ class LolTubeServiceTest {
     }
 
     @Test
-    fun `searchVideos should handle empty response`() = runTest {
+    fun `searchVideos는 빈 응답을 처리해야 한다`() = runTest {
         // Given
         val expectedResponse = LolTubeSearchResponse(items = emptyList())
 
@@ -103,7 +103,7 @@ class LolTubeServiceTest {
     }
 
     @Test
-    fun `searchVideos should handle null videoId`() = runTest {
+    fun `searchVideos는 null videoId를 처리해야 한다`() = runTest {
         // Given
         val expectedResponse = LolTubeSearchResponse(
             items = listOf(

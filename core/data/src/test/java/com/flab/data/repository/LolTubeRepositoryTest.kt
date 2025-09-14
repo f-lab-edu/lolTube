@@ -29,7 +29,7 @@ class LolTubeRepositoryTest {
     }
 
     @Test
-    fun `searchVideos should return mapped domain objects`() = runTest {
+    fun `searchVideos는 매핑된 도메인 객체를 반환해야 한다`() = runTest {
         // Given
         val query = "test"
         val maxResults = 10
@@ -73,7 +73,7 @@ class LolTubeRepositoryTest {
     }
 
     @Test(expected = Exception::class)
-    fun `searchVideos should propagate service exceptions`() = runTest {
+    fun `searchVideos는 서비스 예외를 전파해야 한다`() = runTest {
         // Given
         whenever(
             lolTubeService.searchVideos(

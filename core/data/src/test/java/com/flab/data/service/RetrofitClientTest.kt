@@ -23,13 +23,13 @@ class RetrofitClientTest {
     }
 
     @Test
-    fun `LolTubeService mock should be created successfully`() {
+    fun `LolTubeService mock이 성공적으로 생성되어야 한다`() {
         // Then
         assertNotNull("LolTubeService mock should be created", lolTubeService)
     }
 
     @Test
-    fun `LolTubeService should have searchVideos method that returns LolTubeSearchResponse`() =
+    fun `LolTubeService는 LolTubeSearchResponse를 반환하는 searchVideos 메소드를 가져야 한다`() =
         runTest {
         // Given
         val mockResponse = LolTubeSearchResponse(items = emptyList())
@@ -60,7 +60,7 @@ class RetrofitClientTest {
     }
 
     @Test
-    fun `LolTubeService interface should be accessible from data module`() {
+    fun `LolTubeService 인터페이스는 data 모듈에서 접근 가능해야 한다`() {
         // Given & When
         val isInterface = LolTubeService::class.java.isInterface
         val className = LolTubeService::class.simpleName

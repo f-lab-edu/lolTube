@@ -24,7 +24,7 @@ class SearchVideosUseCaseTest {
     }
 
     @Test
-    fun `invoke should return video list from repository with default parameters`() = runTest {
+    fun `invoke는 기본 매개변수로 repository에서 비디오 리스트를 반환해야 한다`() = runTest {
         // Given
         val query = "리그오브레전드"
         val expectedVideos = listOf(
@@ -58,7 +58,7 @@ class SearchVideosUseCaseTest {
     }
 
     @Test
-    fun `invoke should return video list with custom parameters`() = runTest {
+    fun `invoke는 사용자 정의 매개변수로 비디오 리스트를 반환해야 한다`() = runTest {
         // Given
         val query = "롤드컵"
         val maxResults = 5
@@ -88,7 +88,7 @@ class SearchVideosUseCaseTest {
     }
 
     @Test
-    fun `invoke should return empty list when no videos found`() = runTest {
+    fun `invoke는 비디오를 찾을 수 없을 때 빈 리스트를 반환해야 한다`() = runTest {
         // Given
         val query = "존재하지않는검색어"
         val emptyList = emptyList<Video>()
@@ -109,7 +109,7 @@ class SearchVideosUseCaseTest {
     }
 
     @Test(expected = Exception::class)
-    fun `invoke should propagate repository exceptions`() = runTest {
+    fun `invoke는 repository 예외를 전파해야 한다`() = runTest {
         // Given
         val query = "테스트"
         whenever(
@@ -125,7 +125,7 @@ class SearchVideosUseCaseTest {
     }
 
     @Test
-    fun `invoke should handle special characters in query`() = runTest {
+    fun `invoke는 쿼리의 특수 문자를 처리해야 한다`() = runTest {
         // Given
         val query = "LOL 2024 챔피언쉽 🏆"
         val expectedVideos = listOf(
