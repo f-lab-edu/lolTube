@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.flab.shorts.ShortsViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.flab.shorts.model.ShortsUiState
 
 
 private const val TAG = "ShortsWebView"
@@ -24,20 +25,33 @@ private const val TAG = "ShortsWebView"
 fun ShortsRoute(
     viewModel: ShortsViewModel = hiltViewModel()
 ) {
-    val shortsVideos by viewModel.shortsVideoIds.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentState = uiState
 
     LaunchedEffect(Unit) {
-        if (shortsVideos.isEmpty()) {
+        if (currentState is ShortsUiState.Loading) {
             viewModel.fetchShortsVideos()
         }
     }
 
-    val videoIds = shortsVideos.map { it.videoId }
-
-    if (videoIds.isNotEmpty()) {
-        ShortsPager(
-            videoIds = videoIds
-        )
+    when (currentState) {
+        is ShortsUiState.Loading -> {
+            LoadingIndicator()
+        }
+        is ShortsUiState.Success -> {
+            val videoIds = currentState.videos.map { it.videoId }
+            if (videoIds.isNotEmpty()) {
+                ShortsPager(
+                    videoIds = videoIds
+                )
+            }
+        }
+        is ShortsUiState.Error -> {
+            ErrorStateIndicator(
+                errorType = currentState.errorType,
+                onReload = { viewModel.reloadShortsVideos() }
+            )
+        }
     }
 }
 
