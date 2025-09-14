@@ -1,4 +1,4 @@
-package com.flab.main.webview
+package com.flab.shorts.webview
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -9,10 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
@@ -37,14 +33,21 @@ fun ShortsPlayer(
 
     LaunchedEffect(isActive, webViewRef) {
         webViewRef?.let { webView ->
-            if (isActive) {
-                Log.d(TAG, "Page activated, playing video: $videoId")
-                webView.evaluateJavascript("if(window.player){ player.playVideo(); }", null)
-            } else {
-                Log.d(TAG, "Page deactivated, pausing video: $videoId")
-                webView.evaluateJavascript(
-                    "if(window.player){ player.pauseVideo(); player.mute(); }",
-                    null
+            try {
+                if (isActive) {
+                    Log.d(TAG, "Page activated, playing video: $videoId")
+                    webView.evaluateJavascript("if(window.player){ player.playVideo(); }", null)
+                } else {
+                    Log.d(TAG, "Page deactivated, pausing video: $videoId")
+                    webView.evaluateJavascript(
+                        "if(window.player){ player.pauseVideo(); player.mute(); }",
+                        null
+                    )
+                }
+            } catch (e: Exception) {
+                Log.w(
+                    TAG,
+                    "Error evaluating JavaScript on WebView for video $videoId: ${e.message}"
                 )
             }
         }
@@ -52,10 +55,16 @@ fun ShortsPlayer(
 
     LaunchedEffect(videoId, isActive, webViewRef) {
         if (!isActive) {
-            webViewRef?.evaluateJavascript(
-                "if(window.player){ player.pauseVideo(); player.stopVideo(); }",
-                null
-            )
+            webViewRef?.let { webView ->
+                try {
+                    webView.evaluateJavascript(
+                        "if(window.player){ player.pauseVideo(); player.stopVideo(); }",
+                        null
+                    )
+                } catch (e: Exception) {
+                    Log.w(TAG, "Error stopping video $videoId: ${e.message}")
+                }
+            }
         }
     }
 
@@ -65,10 +74,16 @@ fun ShortsPlayer(
                 Lifecycle.Event.ON_RESUME -> {
                     if (isActive) {
                         Log.d(TAG, "App resumed, trying to resume video")
-                        webViewRef?.evaluateJavascript(
-                            "if(window.player && window.player.getPlayerState() === 2){ player.playVideo(); }",
-                            null
-                        )
+                        webViewRef?.let { webView ->
+                            try {
+                                webView.evaluateJavascript(
+                                    "if(window.player && window.player.getPlayerState() === 2){ player.playVideo(); }",
+                                    null
+                                )
+                            } catch (e: Exception) {
+                                Log.w(TAG, "Error resuming video $videoId: ${e.message}")
+                            }
+                        }
                     }
                 }
 
@@ -82,12 +97,6 @@ fun ShortsPlayer(
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
-            webViewRef?.let { webView ->
-                webView.clearCache(true)
-                webView.clearHistory()
-                webView.removeAllViews()
-                webView.destroy()
-            }
         }
     }
 

@@ -20,7 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.flab.home.LolTubeVideoListRoute
 import com.flab.main.component.MainNavigationBar
 import com.flab.main.component.NavigationItem
-import com.flab.main.webview.ShortsPager
+import com.flab.shorts.webview.ShortsRoute
 
 @Composable
 fun MainRoute() {
@@ -92,15 +92,7 @@ fun MainScreen(
                 LolTubeVideoListRoute()
             }
             composable("shorts") {
-                ShortsPager(
-                    videoIds = listOf(
-                        "Cmb2plgG328",
-                        "_qvDfygshj4",
-                        "41eQ4n4EtX8",
-                        "fJKkakGuToQ",
-                        "-_6v3Poz9oU"
-                    )
-                )
+                ShortsRoute()
             }
         }
     }
