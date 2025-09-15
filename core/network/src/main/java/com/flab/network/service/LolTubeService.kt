@@ -14,6 +14,7 @@ interface LolTubeService {
         @Query("type") type: String = "video",
         @Query("maxResults") maxResults: Int = 10,
         @Query("regionCode") regionCode: String = "KR",
-        @Query("videoEmbeddable") videoEmbeddable: String = "true"
+        @Query("videoEmbeddable") videoEmbeddable: String = "true",
+        @Query("pageToken") pageToken: String? = null
     ): LolTubeSearchResponse
 }

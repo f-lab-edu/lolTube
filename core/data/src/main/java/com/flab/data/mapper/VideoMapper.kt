@@ -4,7 +4,7 @@ import com.flab.domain.model.Video
 import com.flab.network.response.youtube.VideoItem
 
 fun VideoItem.toDomain(): Video = Video(
-    videoId = id.videoId ?: "",
+    videoId = id.videoId?.takeIf { it.isNotBlank() } ?: "unknown_${hashCode()}",
     title = snippet.title,
     channelTitle = snippet.channelTitle,
     thumbnailUrl = snippet.thumbnails.high?.url

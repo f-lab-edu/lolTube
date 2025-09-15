@@ -3,7 +3,8 @@ package com.flab.network.response.youtube
 import com.google.gson.annotations.SerializedName
 
 data class LolTubeSearchResponse(
-    @SerializedName("items") val items: List<VideoItem>
+    @SerializedName("items") val items: List<VideoItem>,
+    @SerializedName("nextPageToken") val nextPageToken: String?
 )
 
 data class VideoItem(

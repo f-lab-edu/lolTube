@@ -1,11 +1,18 @@
 package com.flab.home.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -16,9 +23,45 @@ import com.flab.domain.model.Video
 fun VideoList(
     videos: List<Video>,
     modifier: Modifier = Modifier,
-    onVideoClick: (Video) -> Unit = {}
+    isLoading: Boolean = false,
+    hasMorePages: Boolean = true,
+    onVideoClick: (Video) -> Unit = {},
+    onLoadMore: () -> Unit = {}
 ) {
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(listState.isScrollInProgress, isLoading, hasMorePages, videos.size) {
+        if (!listState.isScrollInProgress && !isLoading && hasMorePages && videos.isNotEmpty()) {
+            val layoutInfo = listState.layoutInfo
+            val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+            val totalItemsCount = layoutInfo.totalItemsCount
+
+            if (lastVisibleItemIndex >= totalItemsCount - 4) {
+                onLoadMore()
+            }
+        }
+    }
+
+    LaunchedEffect(listState.canScrollForward, isLoading, hasMorePages) {
+        if (!listState.canScrollForward && !isLoading && hasMorePages && videos.isNotEmpty()) {
+            onLoadMore()
+        }
+    }
+
+    LaunchedEffect(videos.size, isLoading, hasMorePages) {
+        if (!isLoading && hasMorePages && videos.isNotEmpty()) {
+            val layoutInfo = listState.layoutInfo
+            val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+            val totalItemsCount = layoutInfo.totalItemsCount
+
+            if (lastVisibleItemIndex >= totalItemsCount - 3) {
+                onLoadMore()
+            }
+        }
+    }
+
     LazyColumn(
+        state = listState,
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(
             horizontal = 16.dp,
@@ -28,12 +71,31 @@ fun VideoList(
     ) {
         items(
             items = videos,
-            key = { video -> video.videoId }
+            key = { video ->
+                if (video.videoId.isNotBlank()) {
+                    video.videoId
+                } else {
+                    "${video.title}-${video.channelTitle}-${video.hashCode()}"
+                }
+            }
         ) { video ->
             VideoCard(
                 video = video,
                 onClick = { onVideoClick(video) }
             )
+        }
+
+        if (isLoading) {
+            item(key = "loading_indicator") {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
         }
     }
 }
