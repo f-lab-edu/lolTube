@@ -1,6 +1,7 @@
 package com.flab.data.repository
 
 import com.flab.domain.model.Video
+import com.flab.domain.model.VideoSearchResult
 import com.flab.domain.repository.VideoRepository
 import com.flab.data.mapper.toDomain
 import com.flab.network.service.LolTubeService
@@ -22,5 +23,26 @@ class VideoRepositoryImpl @Inject constructor(
             regionCode = regionCode
         )
         return response.items.map { it.toDomain() }
+    }
+
+    override suspend fun searchVideosWithPaging(
+        query: String,
+        maxResults: Int,
+        regionCode: String,
+        pageToken: String?
+    ): VideoSearchResult {
+        val response = lolTubeService.searchVideos(
+            apiKey = BuildConfig.YOUTUBE_API_KEY,
+            query = query,
+            maxResults = maxResults,
+            regionCode = regionCode,
+            pageToken = pageToken
+        )
+        val videos = response.items.map { it.toDomain() }
+
+        return VideoSearchResult(
+            videos = videos,
+            nextPageToken = response.nextPageToken
+        )
     }
 }

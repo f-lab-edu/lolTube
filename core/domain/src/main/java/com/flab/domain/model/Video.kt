@@ -6,3 +6,9 @@ data class Video(
     val channelTitle: String,
     val thumbnailUrl: String?
 )
+
+data class VideoSearchResult(
+    val videos: List<Video>,
+    val nextPageToken: String?,
+    val hasMorePages: Boolean = nextPageToken != null
+)

@@ -22,6 +22,8 @@ fun LolTubeVideoListRoute(
     viewModel: LolTubeViewModel = hiltViewModel()
 ) {
     val videos by viewModel.videos.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val hasMorePages by viewModel.hasMorePages.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -30,9 +32,14 @@ fun LolTubeVideoListRoute(
 
     LolTubeVideoListScreen(
         videos = videos,
+        isLoading = isLoading,
+        hasMorePages = hasMorePages,
         modifier = modifier,
         onVideoClick = { video ->
             openYouTubeVideo(context, video.videoId)
+        },
+        onLoadMore = {
+            viewModel.loadMoreVideos()
         }
     )
 }
@@ -53,19 +60,24 @@ private fun openYouTubeVideo(context: Context, videoId: String) {
 fun LolTubeVideoListScreen(
     videos: List<Video>,
     modifier: Modifier = Modifier,
-    onVideoClick: (Video) -> Unit = {}
+    isLoading: Boolean = false,
+    hasMorePages: Boolean = true,
+    onVideoClick: (Video) -> Unit = {},
+    onLoadMore: () -> Unit = {}
 ) {
-    if (videos.isEmpty()) {
+    if (videos.isEmpty() && !isLoading) {
         EmptyVideoList(modifier = modifier)
     } else {
         VideoList(
             videos = videos,
+            isLoading = isLoading,
+            hasMorePages = hasMorePages,
             modifier = modifier,
-            onVideoClick = onVideoClick
+            onVideoClick = onVideoClick,
+            onLoadMore = onLoadMore
         )
     }
 }
-
 
 private val sampleVideos = listOf(
     Video(
@@ -88,7 +100,8 @@ private fun LolTubeVideoListScreenPreview() {
     LolTubeTheme {
         LolTubeVideoListScreen(
             videos = sampleVideos,
-            onVideoClick = { }
+            onVideoClick = { },
+            onLoadMore = {}
         )
     }
 }
@@ -99,7 +112,8 @@ private fun LolTubeVideoListScreenEmptyPreview() {
     LolTubeTheme {
         LolTubeVideoListScreen(
             videos = emptyList(),
-            onVideoClick = { }
+            onVideoClick = { },
+            onLoadMore = {}
         )
     }
 }
